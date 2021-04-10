@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modes</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 60em;
+      margin: auto;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    td {
+      border: 1px solid black;
+      padding: 0.5em;
+      text-align: center;
+    }
+
+    tr:nth-child(even) {
+      background-color: #eee;
+    }
+
+    tr:nth-child(odd) {
+      background-color: #ddd;
+    }
+
+    tr:first-child, tr:last-child {
+      background-color: #aaa;
+    }
+
+    .selected {
+      background-color: lightblue;
+    }
+
+    .option-list {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .option {
+      margin: 0.5em;
+    }
+  </style>
+</head>
+<body>
+  <div id="main">
+    <div class="option-list">
+      <div class="option">
+        Scale type: <select v-model="scale_idx">
+          <option v-for="(s, index) in scale_names" :value="index">
+            {{ s }}
+          </option>
+        </select>
+      </div>
+      <div class="option">Show modes: <input type="checkbox" v-model="show_mode"></div>
+      <div class="option">
+        Accidentals: <select v-model="type_idx">
+        <option value="0">Sharps</option>
+        <option value="1">Flats</option>
+      </select></div>
+      <div class="option">
+        Chord type: <select v-model="chords_type">
+        <option value="0">Normal</option>
+        <option value="1">Extended</option>
+      </select></div>
+    </div>
+    
+    <table>
+        <tr>
+          <td v-for="mode in header">
+            {{ mode }}
+          </td>
+        </tr>
+        <tr v-for="row in rows">
+          <td v-for="col in row" @click="selected = col" :class="{ selected: selected === col }">
+            {{ col }}
+          </td>
+        </tr>
+        <tr>
+          <td v-for="mode in header">
+            {{ mode }}
+          </td>
+        </tr>
+    </table>
+  </div>
+  <script>
+    const notes_sharps = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    const notes_flats = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
+    const notes_both = [notes_sharps, notes_flats]
+
+    const scales = [
+          { name: "Major",
+            intervals: [0, 2, 4, 5, 7, 9, 11],
+            chords: ["", "m", "m", "", "", "m", "°"],
+            extendedChords: ["maj7", "m7", "m7", "maj7", "7", "m7", "m7b5"],
+            modes: ["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian"] },
+
+          { name: "Melodic minor",
+            intervals: [0, 2, 3, 5, 7, 9, 11],
+            chords: ["m", "m", "+", "", "", "°", "°"],
+            extendedChords: ["minMaj7", "m7", "maj7#5", "7", "7", "m7b5", "m7b5"],
+            modes: ["", "", "", "", "", "", ""] },
+
+          { name: "Harmonic minor",
+            intervals: [0, 2, 3, 5, 7, 8, 11],
+            chords: ["m", "°", "+", "m", "", "", "°"],
+            extendedChords: ["minMaj7", "m7b5", "maj7#5", "m7", "7", "maj7", "dim7"],
+            modes: ["", "", "", "", "", "", ""] }
+        ];
+
+    const app = new Vue({
+      el: '#main',
+      data: {
+        scale_names: [ "Major", "Melodic minor", "Harmonic minor" ],
+        grades: ["I", "II", "III", "IV", "V", "VI", "VII"],
+        type_idx: 0,
+        scale_idx: 0,
+        chords_type: 0,
+        show_mode: false,
+        selected: null
+      },
+      computed: {
+        header: function() {
+          return this.grades.map((x, i) => {
+            if(this.modes[i] && this.show_mode) {
+              return `${x} (${this.modes[i]})`;
+            } else {
+              return x;
+            }
+          })
+        },
+        notes: function() {
+          return [notes_sharps, notes_flats][this.type_idx]
+        },
+        scale: function() {
+          return scales[this.scale_idx]
+        },
+        scale_name: function() {
+          return this.scale.name
+        },
+        modes: function() {
+          return this.scale.modes
+        },
+        intervals: function() {
+          return this.scale.intervals
+        },
+        chords: function() {
+          return [this.scale.chords, this.scale.extendedChords][this.chords_type]
+        },
+        rows: function() {
+          const res = []
+          for(let i = 0; i < this.notes.length; i++) {
+            const row = []
+            for(let j = 0; j < this.intervals.length; j++) {
+              const interval = this.intervals[j]
+              row.push(this.notes[(i + interval) % this.notes.length] + this.chords[j])
+            }
+            res.push(row)
+          }
+          return res
+        }
+      }
+    })
+  </script>
+</body>
+</html>
