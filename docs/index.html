@@ -103,6 +103,12 @@
             extendedChords: ["maj7", "m7", "m7", "maj7", "7", "m7", "m7b5"],
             modes: ["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian"] },
 
+          { name: "Natural minor",
+            intervals: [0, 2, 3, 5, 7, 8, 10],
+            chords: ["m", "°", "", "m", "m", "", ""],
+            extendedChords: ["m7", "m7b5", "maj7", "m7", "m7", "maj7", "7"],
+            modes: ["Aeolian", "Locrian", "Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian"] },
+
           { name: "Melodic minor",
             intervals: [0, 2, 3, 5, 7, 9, 11],
             chords: ["m", "m", "+", "", "", "°", "°"],
@@ -119,7 +125,7 @@
     const app = new Vue({
       el: '#main',
       data: {
-        scale_names: [ "Major", "Melodic minor", "Harmonic minor" ],
+        scale_names: scales.map(x => x.name),
         grades: ["I", "II", "III", "IV", "V", "VI", "VII"],
         type_idx: 0,
         scale_idx: 0,
