@@ -71,6 +71,14 @@
         <option value="0">Normal</option>
         <option value="1">Extended</option>
       </select></div>
+      <div class="option">
+        Mode:
+        <select v-model="mode">
+          <option v-for="(s, index) in modes" :value="index">
+            {{ s }}
+          </option>
+        </select>
+      </div>
     </div>
     
     <table>
@@ -101,25 +109,19 @@
             intervals: [0, 2, 4, 5, 7, 9, 11],
             chords: ["", "m", "m", "", "", "m", "°"],
             extendedChords: ["maj7", "m7", "m7", "maj7", "7", "m7", "m7b5"],
-            modes: ["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian", "Locrian"] },
-
-          { name: "Natural minor",
-            intervals: [0, 2, 3, 5, 7, 8, 10],
-            chords: ["m", "°", "", "m", "m", "", ""],
-            extendedChords: ["m7", "m7b5", "maj7", "m7", "m7", "maj7", "7"],
-            modes: ["Aeolian", "Locrian", "Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian"] },
+            modes: ["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian (nat. minor)", "Locrian"] },
 
           { name: "Melodic minor",
             intervals: [0, 2, 3, 5, 7, 9, 11],
             chords: ["m", "m", "+", "", "", "°", "°"],
             extendedChords: ["minMaj7", "m7", "maj7#5", "7", "7", "m7b5", "m7b5"],
-            modes: ["", "", "", "", "", "", ""] },
+            modes: ["Melodic minor", "Dorian b2", "Lydian Aug", "Lydian Dom", "Mixolydian b13", "Locrian #2", "Super locrian"] },
 
           { name: "Harmonic minor",
             intervals: [0, 2, 3, 5, 7, 8, 11],
             chords: ["m", "°", "+", "m", "", "", "°"],
             extendedChords: ["minMaj7", "m7b5", "maj7#5", "m7", "7", "maj7", "dim7"],
-            modes: ["", "", "", "", "", "", ""] }
+            modes: ["Aeolian #7", "Locrian #6", "Ionian #5", "Dorian #4", "Mixolydian b2 b6", "Lydian #2", "Locrian b4 b7"] }
         ];
 
     const app = new Vue({
@@ -130,14 +132,16 @@
         type_idx: 0,
         scale_idx: 0,
         chords_type: 0,
+        mode: 0,
         show_mode: false,
         selected: null
       },
       computed: {
         header: function() {
           return this.grades.map((x, i) => {
-            if(this.modes[i] && this.show_mode) {
-              return `${x} (${this.modes[i]})`;
+            let j = (i + this.mode) % this.modes.length
+            if(this.modes[j] && this.show_mode) {
+              return `${x} (${this.modes[j]})`;
             } else {
               return x;
             }
@@ -166,8 +170,9 @@
           for(let i = 0; i < this.notes.length; i++) {
             const row = []
             for(let j = 0; j < this.intervals.length; j++) {
-              const interval = this.intervals[j]
-              row.push(this.notes[(i + interval) % this.notes.length] + this.chords[j])
+              let k = (j + this.mode) % this.intervals.length
+              const interval = this.intervals[k]
+              row.push(this.notes[(i + interval) % this.notes.length] + this.chords[k])
             }
             res.push(row)
           }
