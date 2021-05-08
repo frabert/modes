@@ -52,35 +52,37 @@
 </head>
 <body>
   <div id="main">
-    <div class="option-list">
-      <div class="option">
-        Scale type: <select v-model="scale_idx">
-          <option v-for="(s, index) in scale_names" :value="index">
-            {{ s }}
-          </option>
-        </select>
+    <details>
+      <summary>Options</summary>
+      <div class="option-list">
+        <div class="option">
+          Scale type: <select v-model="scale_idx">
+            <option v-for="(s, index) in scale_names" :value="index">
+              {{ s }}
+            </option>
+          </select>
+        </div>
+        <div class="option">Show modes: <input type="checkbox" v-model="show_mode"></div>
+        <div class="option">
+          Accidentals: <select v-model="type_idx">
+          <option value="0">Sharps</option>
+          <option value="1">Flats</option>
+        </select></div>
+        <div class="option">
+          Chord type: <select v-model="chords_type">
+          <option value="0">Normal</option>
+          <option value="1">Extended</option>
+        </select></div>
+        <div class="option">
+          Mode:
+          <select v-model="mode">
+            <option v-for="(s, index) in modes" :value="index">
+              {{ s }}
+            </option>
+          </select>
+        </div>
       </div>
-      <div class="option">Show modes: <input type="checkbox" v-model="show_mode"></div>
-      <div class="option">
-        Accidentals: <select v-model="type_idx">
-        <option value="0">Sharps</option>
-        <option value="1">Flats</option>
-      </select></div>
-      <div class="option">
-        Chord type: <select v-model="chords_type">
-        <option value="0">Normal</option>
-        <option value="1">Extended</option>
-      </select></div>
-      <div class="option">
-        Mode:
-        <select v-model="mode">
-          <option v-for="(s, index) in modes" :value="index">
-            {{ s }}
-          </option>
-        </select>
-      </div>
-    </div>
-    
+    </details>
     <table>
         <tr>
           <td v-for="mode in header">
