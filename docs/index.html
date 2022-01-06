@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -32,7 +33,8 @@
       background-color: #ddd;
     }
 
-    tr:first-child, tr:last-child {
+    tr:first-child,
+    tr:last-child {
       background-color: #aaa;
     }
 
@@ -50,7 +52,9 @@
     }
   </style>
 </head>
+
 <body>
+  <a href="/index.html">Modes</a> - <a href="/chord_finder.html">Chord finder</a>
   <div id="main">
     <details>
       <summary>Options</summary>
@@ -65,14 +69,14 @@
         <div class="option">Show modes: <input type="checkbox" v-model="show_mode"></div>
         <div class="option">
           Accidentals: <select v-model="type_idx">
-          <option value="0">Sharps</option>
-          <option value="1">Flats</option>
-        </select></div>
+            <option value="0">Sharps</option>
+            <option value="1">Flats</option>
+          </select></div>
         <div class="option">
           Chord type: <select v-model="chords_type">
-          <option value="0">Normal</option>
-          <option value="1">Extended</option>
-        </select></div>
+            <option value="0">Normal</option>
+            <option value="1">Extended</option>
+          </select></div>
         <div class="option">
           Mode:
           <select v-model="mode">
@@ -84,21 +88,21 @@
       </div>
     </details>
     <table>
-        <tr>
-          <td v-for="mode in header">
-            {{ mode }}
-          </td>
-        </tr>
-        <tr v-for="row in rows">
-          <td v-for="col in row" @click="selected = col" :class="{ selected: selected === col }">
-            {{ col }}
-          </td>
-        </tr>
-        <tr>
-          <td v-for="mode in header">
-            {{ mode }}
-          </td>
-        </tr>
+      <tr>
+        <td v-for="mode in header">
+          {{ mode }}
+        </td>
+      </tr>
+      <tr v-for="row in rows">
+        <td v-for="col in row" @click="selected = col" :class="{ selected: selected === col }">
+          {{ col }}
+        </td>
+      </tr>
+      <tr>
+        <td v-for="mode in header">
+          {{ mode }}
+        </td>
+      </tr>
     </table>
   </div>
   <script>
@@ -107,24 +111,30 @@
     const notes_both = [notes_sharps, notes_flats]
 
     const scales = [
-          { name: "Major",
-            intervals: [0, 2, 4, 5, 7, 9, 11],
-            chords: ["", "m", "m", "", "", "m", "°"],
-            extendedChords: ["maj7", "m7", "m7", "maj7", "7", "m7", "m7b5"],
-            modes: ["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian (nat. minor)", "Locrian"] },
+      {
+        name: "Major",
+        intervals: [0, 2, 4, 5, 7, 9, 11],
+        chords: ["", "m", "m", "", "", "m", "°"],
+        extendedChords: ["maj7", "m7", "m7", "maj7", "7", "m7", "m7b5"],
+        modes: ["Ionian", "Dorian", "Phrygian", "Lydian", "Mixolydian", "Aeolian (nat. minor)", "Locrian"]
+      },
 
-          { name: "Melodic minor",
-            intervals: [0, 2, 3, 5, 7, 9, 11],
-            chords: ["m", "m", "+", "", "", "°", "°"],
-            extendedChords: ["minMaj7", "m7", "maj7#5", "7", "7", "m7b5", "m7b5"],
-            modes: ["Melodic minor", "Dorian b2", "Lydian Aug", "Lydian Dom", "Mixolydian b13", "Locrian #2", "Super locrian"] },
+      {
+        name: "Melodic minor",
+        intervals: [0, 2, 3, 5, 7, 9, 11],
+        chords: ["m", "m", "+", "", "", "°", "°"],
+        extendedChords: ["minMaj7", "m7", "maj7#5", "7", "7", "m7b5", "m7b5"],
+        modes: ["Melodic minor", "Dorian b2", "Lydian Aug", "Lydian Dom", "Mixolydian b13", "Locrian #2", "Super locrian"]
+      },
 
-          { name: "Harmonic minor",
-            intervals: [0, 2, 3, 5, 7, 8, 11],
-            chords: ["m", "°", "+", "m", "", "", "°"],
-            extendedChords: ["minMaj7", "m7b5", "maj7#5", "m7", "7", "maj7", "dim7"],
-            modes: ["Aeolian #7", "Locrian #6", "Ionian #5", "Dorian #4", "Mixolydian b2 b6", "Lydian #2", "Locrian b4 b7"] }
-        ];
+      {
+        name: "Harmonic minor",
+        intervals: [0, 2, 3, 5, 7, 8, 11],
+        chords: ["m", "°", "+", "m", "", "", "°"],
+        extendedChords: ["minMaj7", "m7b5", "maj7#5", "m7", "7", "maj7", "dim7"],
+        modes: ["Aeolian #7", "Locrian #6", "Ionian #5", "Dorian #4", "Mixolydian b2 b6", "Lydian #2", "Locrian b4 b7"]
+      }
+    ];
 
     const app = new Vue({
       el: '#main',
@@ -139,39 +149,39 @@
         selected: null
       },
       computed: {
-        header: function() {
+        header: function () {
           return this.grades.map((x, i) => {
             let j = (i + this.mode) % this.modes.length
-            if(this.modes[j] && this.show_mode) {
+            if (this.modes[j] && this.show_mode) {
               return `${x} (${this.modes[j]})`;
             } else {
               return x;
             }
           })
         },
-        notes: function() {
+        notes: function () {
           return [notes_sharps, notes_flats][this.type_idx]
         },
-        scale: function() {
+        scale: function () {
           return scales[this.scale_idx]
         },
-        scale_name: function() {
+        scale_name: function () {
           return this.scale.name
         },
-        modes: function() {
+        modes: function () {
           return this.scale.modes
         },
-        intervals: function() {
+        intervals: function () {
           return this.scale.intervals
         },
-        chords: function() {
+        chords: function () {
           return [this.scale.chords, this.scale.extendedChords][this.chords_type]
         },
-        rows: function() {
+        rows: function () {
           const res = []
-          for(let i = 0; i < this.notes.length; i++) {
+          for (let i = 0; i < this.notes.length; i++) {
             const row = []
-            for(let j = 0; j < this.intervals.length; j++) {
+            for (let j = 0; j < this.intervals.length; j++) {
               let k = (j + this.mode) % this.intervals.length
               const interval = this.intervals[k]
               row.push(this.notes[(i + interval) % this.notes.length] + this.chords[k])
@@ -184,4 +194,5 @@
     })
   </script>
 </body>
+
 </html>

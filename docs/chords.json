@@ -1,0 +1,38 @@
+[
+    {
+        "kind": "major",
+        "postfix": "",
+        "notes": [
+            0,
+            4,
+            7
+        ]
+    },
+    {
+        "kind": "minor",
+        "postfix": "m",
+        "notes": [
+            0,
+            3,
+            7
+        ]
+    },
+    {
+        "kind": "diminished",
+        "postfix": "°",
+        "notes": [
+            0,
+            3,
+            6
+        ]
+    },
+    {
+        "kind": "augmented",
+        "postfix": "+",
+        "notes": [
+            0,
+            4,
+            8
+        ]
+    }
+]

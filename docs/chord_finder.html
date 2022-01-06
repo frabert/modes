@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <title>Chord finder</title>
+    <style>
+        .option-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .option {
+            margin: 0.5em;
+        }
+
+        body {
+            font-family: sans-serif;
+            max-width: 60em;
+            margin: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td {
+            border: 1px solid black;
+            padding: 0.5em;
+            text-align: center;
+        }
+
+        tr:nth-child(even) {
+            background-color: #eee;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #ddd;
+        }
+
+        tr:first-child {
+            background-color: #aaa;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/index.html">Modes</a> - <a href="/chord_finder.html">Chord finder</a>
+    <div id="main">
+        <details open>
+            <summary>Options</summary>
+            <div class="option-list">
+                <div class="option">
+                    Accidentals:
+                    <select v-model="type_idx">
+                        <option value="0">Sharps</option>
+                        <option value="1">Flats</option>
+                    </select>
+                </div>
+
+                <div class="option">
+                    Notes:<br>
+                    <select v-model="selected_notes" size="6" multiple>
+                        <option v-for="(note, index) in notes" :value="index">{{ note }}</option>
+                    </select><br>
+                    <input type="radio" v-model="notes_mode" value="AND" />
+                    <label for="AND">AND</label>
+                    <input type="radio" v-model="notes_mode" value="OR" />
+                    <label for="OR">OR</label>
+                </div>
+
+                <div class="option">
+                    Scales:<br>
+                    <select v-model="selected_scales" size="6" multiple>
+                        <option v-for="(scale, index) in scales" :value="index">
+                            {{ notes[scale.root] }} {{ scale.name }}
+                        </option>
+                    </select><br>
+                    <input type="radio" v-model="scales_mode" value="AND" />
+                    <label for="AND">AND</label>
+                    <input type="radio" v-model="scales_mode" value="OR" />
+                    <label for="OR">OR</label>
+                </div>
+            </div>
+        </details>
+        <table>
+            <tr>
+                <td>Name</td>
+                <td>Notes</td>
+            </tr>
+            <tr v-for="chord in filtered_chords">
+                <td>{{ notes[chord.root] }}{{ chord.kind }}</td>
+                <td>
+                    <template v-for="note in chord.notes">
+                        {{ notes[note] }}
+                    </template>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script>
+        const notes_sharps = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        const notes_flats = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
+
+        async function fetch_json(file) {
+            const req = await fetch(file, { cache: "no-store" })
+            return await req.json()
+        }
+
+        async function init() {
+            const chord_templates = await fetch_json('chords.json')
+            const scale_templates = await fetch_json('scales.json')
+
+            const chords = chord_templates.flatMap(x => {
+                return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(root => {
+                    return {
+                        root: root,
+                        kind: x.postfix,
+                        notes: x.notes.map(note => {
+                            return (note + root) % 12
+                        })
+                    }
+                })
+            })
+
+            const scales = scale_templates.flatMap(x => {
+                return [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(root => {
+                    return {
+                        root: root,
+                        name: x.name,
+                        notes: x.notes.map(note => {
+                            return (note + root) % 12
+                        })
+                    }
+                })
+            })
+
+            const app = new Vue({
+                el: '#main',
+                data: {
+                    scales: scales,
+                    type_idx: 0,
+                    selected_notes: [],
+                    selected_scales: [],
+                    notes_mode: "AND",
+                    scales_mode: "AND"
+                },
+                computed: {
+                    notes: function () {
+                        return [notes_sharps, notes_flats][this.type_idx]
+                    },
+                    filtered_chords: function () {
+                        const note_reducer = this.notes_mode === "AND" ? (a, b) => a && b : (a, b) => a || b
+                        const note_base = this.notes_mode === "AND"
+
+                        const scale_reducer = this.scales_mode === "AND" ? (a, b) => a && b : (a, b) => a || b
+                        const scale_base = this.scales_mode === "AND"
+
+                        return chords
+                            .filter(chord => this.selected_notes.map(note => chord.notes.includes(note)).reduce(note_reducer, note_base))
+                            .filter(chord => this.selected_scales.map(scale => chord.notes.every(note => scales[scale].notes.includes(note))).reduce(scale_reducer, scale_base))
+                    }
+                }
+            })
+        }
+
+        init()
+    </script>
+</body>
+
+</html>
